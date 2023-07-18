@@ -1,3 +1,5 @@
+const coworkings = require("../dataBase/mock-coworkings");
+
 exports.findAllCoworkingByPK = (req, res) => {
   const criterium = req.query.criterium || "superficy";
   const orderBy = req.query.orderBy || "ASC";

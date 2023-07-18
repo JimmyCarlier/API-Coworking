@@ -14,6 +14,7 @@ sequelize.initDataBase();
 app.use(morgan("dev"));
 app.use(express.json());
 app.use("/api/coworkings", coworkingRouter);
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
