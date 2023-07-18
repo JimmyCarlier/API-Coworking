@@ -1,9 +1,12 @@
 const { log } = require("console");
 const express = require("express");
 const coworkings = require("./mock-coworkings");
+// npm install morgan --save-dev
+const morgan = require("morgan");
 const app = express();
 const port = 3000;
 
+app.use(morgan("dev"));
 app.use(express.json());
 
 app.get("/api/coworkings", (req, res) => {
