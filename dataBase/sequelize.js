@@ -12,22 +12,19 @@ const sequelize = new Sequelize("coworkings", "root", "", {
   logging: false,
 });
 
-const User = sequelize.define("User", {
-  username: DataTypes.STRING,
-  birthday: DataTypes.DATE,
-});
+
+sequelize
+.authenticate()
+.then((data) => {
+  console.log(`la connexion à la base de donnée à bien était établis`);
+})
+.catch((error) =>
+console.log(`Impossible de se connecter à la BDD ${error}`)
+);
+
 
 const coworking = modelCoworking(sequelize, DataTypes);
 const city = modelCity(sequelize, DataTypes);
-
-sequelize
-  .authenticate()
-  .then(() => {
-    console.log("la connexion à la base de donnée à bien était établis");
-  })
-  .catch((error) =>
-    console.log(`Impossible de se connecter à la BDD ${error}`)
-  );
 
 const initDataBase = () => {
   sequelize.sync({ force: true }).then(() => {
@@ -50,5 +47,5 @@ const initDataBase = () => {
 /////////////////
 
 module.exports = {
-  initDataBase,
+  initDataBase, coworking
 };

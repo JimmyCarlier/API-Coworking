@@ -1,4 +1,3 @@
-const { log } = require("console");
 const express = require("express");
 // npm install morgan --save-dev
 const morgan = require("morgan");
