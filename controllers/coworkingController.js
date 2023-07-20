@@ -1,4 +1,4 @@
-const coworkings = require("../dataBase/mock-coworkings");
+const { ValidationError } = require("sequelize");
 const { coworking } = require("../dataBase/sequelize");
 
 exports.findAllCoworkingByPK = (req, res) => {
@@ -58,12 +58,15 @@ exports.createCoworking = (req, res) => {
       created: req.body.created,
     })
     .then(() => {
-      res.json({
+      res.status(201).json({
         message: "La ligne à bien était créée",
       });
     })
     .catch((error) => {
-      res.json({
+      if(error instanceof ValidationError){
+        return res.status(400).json({message : error.message})
+      }
+      res.status(400).json({
         message: `La ligne n'a pas pu être créée car l'erreur est : ${error}`,
       });
     });
@@ -87,7 +90,7 @@ exports.getNameById = (req, res) => {
       res.json({ message: data.name });
     })
     .catch((error) => {
-      res.json({ message: `Erreur ! Erreur ! Erreur ! ${error}` });
+      res.status(400).json({ message: `Erreur ! ${error}` });
     });
 };
 
@@ -119,7 +122,7 @@ exports.updateById = (req, res) => {
       res.json(result);
     })
     .catch((error) => {
-      res.json({ message: `Erreur ! Erreur ! Erreur ! ${error}` });
+      res.status(400).json({ message: `Erreur ! Erreur ! Erreur ! ${error}` });
     });
 };
 
@@ -154,6 +157,8 @@ exports.deleteById = (req, res) => {
       });
     })
     .catch((error) => {
-      res.json({ message: `Erreur ! Erreur ! Erreur ! ${error}` });
+      res.status(400).json({ message: `Erreur ! Erreur ! Erreur ! ${error}` });
     });
 };
+
+

@@ -6,6 +6,7 @@ const app = express();
 const port = 3000;
 
 const coworkingRouter = require("./routes/coworkingRoutes");
+const userRoutes = require("./routes/userRoutes")
 const sequelize = require("./dataBase/sequelize");
 
 sequelize.initDataBase();
@@ -13,6 +14,7 @@ sequelize.initDataBase();
 app.use(morgan("dev"));
 app.use(express.json());
 app.use("/api/coworkings", coworkingRouter);
+app.use("/api/user", userRoutes);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
