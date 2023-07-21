@@ -6,6 +6,9 @@ const mockCoworking = require("./mock-coworkings");
 const modelCoworking = require("../model/modelCoworking");
 const modelCity = require("../model/modelCity");
 const userModel = require("../model/userModel");
+const roleModel = require("../model/modelRole");
+const roleApi = require("../dataBase/role.json");
+const bcrypt = require("bcrypt");
 
 const sequelize = new Sequelize("coworkings", "root", "", {
   host: "localhost",
@@ -25,6 +28,14 @@ sequelize
 const coworking = modelCoworking(sequelize, DataTypes);
 const city = modelCity(sequelize, DataTypes);
 const user = userModel(sequelize, DataTypes);
+const role = roleModel(sequelize, DataTypes);
+
+role.hasOne(user, {
+  foreignKey: "roles",
+});
+user.belongsTo(role, {
+  foreignKey: "roles",
+});
 
 const initDataBase = () => {
   sequelize.sync({ force: true }).then(() => {
@@ -42,9 +53,15 @@ const initDataBase = () => {
       //   code_postal: element.address.postCode,
       // });
     });
+    roleApi.map((element) => {
+      role.create({
+        role: element.role,
+      });
+    });
     user.create({
       name: "Jimmy",
       password: "moimeme",
+      roles: 3,
     });
   });
 };
