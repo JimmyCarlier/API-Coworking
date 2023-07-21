@@ -58,11 +58,18 @@ const initDataBase = () => {
         role: element.role,
       });
     });
-    user.create({
-      name: "Jimmy",
-      password: "moimeme",
-      roles: 3,
+    bcrypt.hash("coucou", 10).then((hash) => {
+      return user.create({
+        name: "Jimmy",
+        password: hash,
+        roles: 1,
+      });
     });
+    // user.create({
+    //   name: "Jimmy",
+    //   password: "toto",
+    //   roles: 3,
+    // });
   });
 };
 

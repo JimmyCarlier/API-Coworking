@@ -16,7 +16,7 @@ exports.getAllUser = (req, res) => {
 };
 
 exports.createUser = (req, res) => {
-  const hash = bcrypt
+  bcrypt
     .hash(req.body.password, 10)
     .then((hash) => {
       const dataUser = { ...req.body, password: hash };
@@ -43,16 +43,30 @@ exports.destroyUser = (req, res) => {
 };
 
 exports.updateUser = (req, res) => {
-  user
-    .update(req.body, {
-      where: {
-        id: req.params.id,
-      },
-    })
-    .then((user) => {
-      res.json({ message: `L'utilisateur à était modifiée`, data: user });
+  bcrypt
+    .hash(req.body.password, 10)
+    .then((hash) => {
+      const dataUpdateUser = { ...req.body, password: hash };
+      return user
+        .update(dataUpdateUser, { where: { id: req.params.id } })
+        .then((user) => {
+          res.json({ message: `L'utilisateur à était modifiée`, data: user });
+        });
     })
     .catch((error) => {
       res.json({ message: `Error : ${error}` });
+    });
+};
+
+exports.getUserbyId = (req, res) => {
+  user
+    .findByPk(req.params.id)
+    .then((user) => {
+      res.json({ message: `Voici lutilisateur${req.params.id}`, data: user });
+    })
+    .catch((error) => {
+      res.satus(500).json({
+        message: `Nous n'avons pu récupérer les donnéess -> Voici les erreurs ${error}`,
+      });
     });
 };
