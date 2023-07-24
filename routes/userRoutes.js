@@ -12,7 +12,11 @@ router.route("/login").post(authController.login);
 router
   .route("/:id")
   .delete(authController.protect, userController.destroyUser)
-  .put(userController.updateUser)
+  .put(
+    authController.protect,
+    authController.restrict,
+    userController.updateUser
+  )
   .get(userController.getUserbyId);
 
 module.exports = router;

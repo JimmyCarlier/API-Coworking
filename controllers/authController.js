@@ -2,7 +2,13 @@ const { user } = require("../dataBase/sequelize");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const SECRET_KEY = "ma_cle_secrete";
+const { role } = require("../dataBase/sequelize");
 
+const roleHierarchy = {
+  user: ["user"],
+  edit: ["user", "edit"],
+  admin: ["user", "edit", "admin"],
+};
 exports.signup = (req, res) => {
   bcrypt
     .hash(req.body.password, 10)
@@ -32,12 +38,14 @@ exports.login = (req, res) => {
           );
           res.json({ message: "successfull", data: token });
         } else {
-          return res.json({ message: "wrong password" });
+          return res
+            .status(400)
+            .json({ message: "Username / password is incorrect" });
         }
       });
     })
     .catch(() => {
-      res.status(400).json({ message: "no user found this username" });
+      res.status(400).json({ message: "Username / password is incorrect" });
     });
 };
 
@@ -49,11 +57,52 @@ exports.protect = (req, res, next) => {
   if (token) {
     try {
       const decoded = jwt.verify(token, SECRET_KEY);
-      req.name = decoded.data;
-      res.json({ message: "Vous avez supprimé l'élément", data: decoded });
+      req.username = decoded.data;
+      // res.json({ message: "Vous avez supprimé l'élément", data: decoded });
       next();
     } catch (error) {
       res.json({ message: "Token invalid" });
     }
   }
+};
+
+exports.restrict = (req, res, next) => {
+  user
+    .findOne({ where: { name: req.username } })
+    .then((user) => {
+      if (req.username === user.name) {
+        next();
+      } else {
+        return res.json({
+          message: "Vous ne pouvez pas modifier cet utilisateur",
+        });
+      }
+    })
+    .catch((error) => {
+      return res.json({ message: "coucou fdsdfsdf", data: req.username });
+    });
+};
+
+exports.restrictTo = (roleparam) => {
+  return (req, res, next) => {
+    user
+      .findOne({ where: { name: req.username } })
+      .then((user) => {
+        role.findByPk(user.roles).then((userRole) => {
+          if (roleHierarchy[userRole.role].includes(roleparam)) {
+            next();
+          } else {
+            res.json({
+              message: "Vous n'avez pas les droits nécéssaire",
+            });
+          }
+        });
+      })
+      .catch((error) => {
+        res.json({
+          message: `Vous n'avez pas les droits nécéssaire`,
+          data: error.message,
+        });
+      });
+  };
 };

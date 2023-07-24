@@ -1,0 +1,241 @@
+// NODE --
+// Installer les dépendances
+npm init 
+npm install nodemon
+npm install express
+npm install sequelize
+npm install mariadb
+npm install morgan
+npm install bcrypt
+npm install jsonwebtoken
+
+// Modifier le script du package.json pour utiliser nodemon
+// Ajouter "start": "nodemon app.js" dans la section "scripts"
+
+// 1er -> Créez le dossier DB qui contiendra un fichier nommé sequelize.js
+//--------------------------------------------------------------------------------
+// Une fois Sequelize installé, établir la connexion avec la base de données Coworkings
+const { Sequelize } = require('sequelize');
+const sequelize = new Sequelize("coworkings", "root", "", {
+  host: "localhost",
+  dialect: "mariadb",
+  logging: false,
+});
+
+//--------------------------------------------------------------------------------
+// Authentification à la base de données
+sequelize.authenticate()
+  .then(() => {
+    console.log(`La connexion à la base de données a été établie avec succès.`);
+  })
+  .catch((error) => {
+    console.error(`Impossible de se connecter à la base de données : ${error}`);
+  });
+
+//--------------------------------------------------------------------------------
+
+// Créer un dossier "models" qui comprendra les modèles de tables
+module.exports = (sequelize, DataTypes) => {
+  return sequelize.define("city", {
+    city: DataTypes.STRING,
+    code_postal: DataTypes.INTEGER,
+  });
+};
+
+//--------------------------------------------------------------------------------
+
+// Appeler le modèle et stocker le résultat dans une constante
+const modelCity = require('./models/city');
+
+// Exporter les modèles par la suite
+module.exports = {
+  modelCity,
+};
+
+//--------------------------------------------------------------------------------
+// Initialiser la synchronisation des modèles avec la base de données
+const initDataBase = () => {
+  sequelize.sync({ force: true })
+    .then(() => {
+      console.log("La synchronisation avec la base de données a été effectuée avec succès.");
+    })
+    .catch((error) => {
+      console.error(`Erreur lors de la synchronisation avec la base de données : ${error}`);
+    });
+};
+
+// Appeler initDataBase dans app.js pour effectuer la synchronisation
+initDataBase();
+
+//--------------------------------------------------------------------------------
+
+// 2 -> Créer un dossier "controllers" -> Importer le modèle dans un fichier nommé "coworkingController"
+const { modelCity } = require("../dataBase/sequelize");
+
+//--------------------------------------------------------------------------------
+
+// Créer une fonction pour le contrôleur dans le fichier "coworkingController.js"
+exports.findAllCoworkingByPK = (req, res) => {
+  // Votre code pour trouver tous les espaces de coworking par clé primaire ici
+};
+
+//--------------------------------------------------------------------------------
+
+// Créer un dossier "routes" qui contiendra les fichiers de routage
+const express = require('express');
+const router = express.Router();
+
+// Importer le contrôleur des espaces de coworking
+const coworkingController = require("../controllers/coworkingController");
+
+// Définir les routes et appeler les contrôleurs appropriés
+router.route("/").get(coworkingController.findAllCoworkingByPK);
+
+// Exporter le router
+module.exports = router;
+
+//--------------------------------------------------------------------------------
+
+// Dans app.js, écouter la route indiquée
+const coworkingRouter = require('./routes/coworking');
+
+// Utiliser la route "coworking" pour les requêtes commençant par "/api/coworkings" :
+
+app.use("/api/coworkings", coworkingRouter);
+
+
+//--------------------------------------------------------------------------------
+
+// Pour encrypter un mdp ->
+
+// exports.createUser = (req, res) => {
+  const hash = bcrypt.hash(req.body.password, 10).then((hash) => {
+    const dataUser = { ...req.body, password: hash };
+    return user
+      .create(dataUser)
+      .then((data) => {
+        res.status(500).json({ message: "coucou", data: data });
+      })
+      .catch((error) => {
+        res.status(404).json({ message: "Erreur" });
+      });
+  });
+};
+
+// On appelle la fonction hash et on stock a l'interieur une variable en spread qui va récupéré les value ajouter et modifier le mot de passe en l'encryptant
+
+soit : const hash = bcrypt.hash(req.body.password, 10).then((hash) => {})
+à l'interieur on stock les values : const dataUser = { ...req.body, password: hash } <- hash va modifier la value du mdp 
+
+on return notre user.create(dataUser) <- ici dataUser stock les values / .then / .catch
+
+
+------------------------------------------------------------------------------------
+
+On install jsonwebtoken 
+-> const jwt = require("jsonwebtoken"),
+
+On créee le login :
+
+1er étapes : En fonction des élément du req.body -> user.findOne({ where: { name: req.body.name } })
+
+2e étapes : On compare le mdp du req.body.password à celui de la bdd grace a bcrypt.compare:
+
+.then((user) => {
+      bcrypt.compare(req.body.password, user.password).then((isValid) => )})
+
+3e étapes : Si le mdp isValid alors on créee un token d'identification :
+
+if (isValid) {
+          const token = jwt.sign(
+            {
+              data: req.body.name,
+            },
+            SECRET_KEY,
+            { expiresIn: 60 * 60 }
+          );}
+
+ --> .sign créee un token en fonction du nom de l'utilisateur dans la req (token unique)
+ --> SECRET_KEY permet de générer un token a partir de la chaîne de caractère
+ --> expiresIn établis un durée sur le token
+
+
+ RENDU FINAL -->
+
+ exports.login = (req, res) => {
+  user
+    .findOne({ where: { name: req.body.name } })
+    .then((user) => {
+      bcrypt.compare(req.body.password, user.password).then((isValid) => {
+        if (isValid) {
+          const token = jwt.sign(
+            {
+              data: req.body.name,
+            },
+            SECRET_KEY,
+            { expiresIn: 60 * 60 }
+          );
+          res.json({ message: "successfull", data: token });
+        } else {
+          return res.json({ message: "wrong password" });
+        }
+      });
+    })
+    .catch(() => {
+      res.status(400).json({ message: "no user found this username" });
+    });
+};
+
+On crée le protect -->
+
+1er étapes :
+
+on créee l'export du protect 
+
+exports.protect = (req, res, next) => {} <--- next 
+
+2e étapes :
+
+On rentre une condition qui permet de contrôler l'authorisation (protocole HTTP)
+(en amont qui a était établis lors de la création d'un user)
+
+if (!req.headers.authorization) {
+    return res.status(400).json({ message: `Vous n'êtes pas authentifier` });
+  }
+
+3e étapes : on stock le token dans une constante afin d'en vérifier l'association
+
+const token = req.headers.authorization.split(" ")[1]
+
+4e étapes : On test le token et on vérifie si il existe un user avec ce token
+
+
+on tceck le token avec la secret key avec la méthode .verify :
+const decoded = jwt.verify(token, SECRET_KEY);
+
+if (token) {
+    try {
+      const decoded = jwt.verify(token, SECRET_KEY);
+      req.name = decoded.data;
+      res.json({ message: "Vous avez supprimé l'élément", data: decoded });
+      next();
+    } catch (error) {
+      res.json({ message: "Token invalid" });
+    }
+  }
+
+on fini par utilisé le try catch pour gérer les erreurs 
+
+Puis on déclare le protect dans les routes qui nécéssitent des contrôles :
+
+router
+  .route("/:id")
+  .delete(authController.protect, userController.destroyUser);
+
+module.exports = router;
+
+
+
+
+
+

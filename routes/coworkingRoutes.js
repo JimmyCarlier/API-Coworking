@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const coworkinkController = require("../controllers/coworkingController");
+const authController = require("../controllers/authController");
 
 router
   .route("/")
@@ -10,7 +11,11 @@ router
 router
   .route("/:id")
   .get(coworkinkController.getNameById)
-  .put(coworkinkController.updateById)
+  .put(
+    authController.protect,
+    authController.restrictTo("edit"),
+    coworkinkController.updateById
+  )
   .delete(coworkinkController.deleteById);
 
 module.exports = router;
