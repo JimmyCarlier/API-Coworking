@@ -99,9 +99,8 @@ exports.restrictTo = (roleparam) => {
         });
       })
       .catch((error) => {
-        res.json({
-          message: `Vous n'avez pas les droits nécéssaire`,
-          data: error.message,
+        res.status(403).json({
+          message: error.message,
         });
       });
   };

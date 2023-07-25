@@ -1,11 +1,11 @@
 const { Sequelize, DataTypes } = require("sequelize");
-const mockCoworking = require("./mock-coworkings");
 const modelCoworking = require("../model/modelCoworking");
 const modelCity = require("../model/modelCity");
 const userModel = require("../model/userModel");
 const roleModel = require("../model/modelRole");
-const roleApi = require("../dataBase/role.json");
 const bcrypt = require("bcrypt");
+const commentary = require("../model/commentModel");
+const setDataSample = require("../dataBase/setDataSample");
 
 const sequelize = new Sequelize("coworkings", "root", "", {
   host: "localhost",
@@ -26,6 +26,7 @@ const coworking = modelCoworking(sequelize, DataTypes);
 const city = modelCity(sequelize, DataTypes);
 const user = userModel(sequelize, DataTypes);
 const role = roleModel(sequelize, DataTypes);
+const comment = commentary(sequelize, DataTypes);
 
 role.hasMany(user, {
   foreignKey: "roles",
@@ -35,49 +36,28 @@ user.belongsTo(role, {
 });
 
 user.hasMany(coworking, {
-  foreignKey: "userID",
+  foreignKey: { name: "userID", allowNull: false },
 });
 coworking.belongsTo(user, {
   foreignKey: "userID",
 });
+// ---------------------------
+user.hasMany(comment, {
+  foreignKey: "userID",
+});
+comment.belongsTo(user, {
+  foreignKey: "userID",
+});
+coworking.hasMany(comment, {
+  foreignKey: { name: "coworkingID", allowNull: false },
+});
+comment.belongsTo(coworking, {
+  foreignKey: "coworkingID",
+});
 
 const initDataBase = () => {
   sequelize.sync({ force: true }).then(() => {
-    roleApi.map((element) => {
-      return role.create({
-        role: element.role,
-      });
-    });
-    let userTable = [];
-    userTable.push(
-      bcrypt.hash("coucou", 10).then((hash) => {
-        user.create({
-          name: "Jimmy",
-          password: hash,
-          roles: 1,
-        });
-        for (let index = 0; index < 3; index++) {
-          user.create({
-            name: `edit${index}`,
-            password: hash,
-            roles: 3,
-          });
-        }
-      })
-    );
-    Promise.all(userTable).then(() => {
-      mockCoworking.map((element) => {
-        coworking.create({
-          name: element.name,
-          price: element.price,
-          address: element.address,
-          superficy: element.superficy,
-          capacity: element.capacity,
-          created: element.created,
-          userID: Math.round(Math.random() * 3) + 1,
-        });
-      });
-    });
+    setDataSample(user, role, coworking);
   });
 };
 
@@ -86,4 +66,5 @@ module.exports = {
   coworking,
   user,
   role,
+  comment,
 };

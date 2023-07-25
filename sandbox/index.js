@@ -47,3 +47,21 @@ function sum(...params) {
 }
 
 console.log(sum(1, 5, 8, 9, 7));
+
+class Identity {
+  firstname;
+  lastname;
+  constructor(fParameter, lParameter) {
+    this.firstname = fParameter;
+    this.lastname = lParameter;
+  }
+  getFirstName = () => {
+    return this.firstname;
+  };
+}
+
+const myIdentity = new Identity("Jimmy", "Carlier");
+const myIdentity_2 = new Identity("Pierre", "Dupont");
+const myIdentity_3 = new Identity("Richard", "Merrand");
+
+const name = myIdentity_3.getFirstName();
