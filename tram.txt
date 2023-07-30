@@ -44,9 +44,11 @@ module.exports = (sequelize, DataTypes) => {
 };
 
 //--------------------------------------------------------------------------------
-
-// Appeler le modèle et stocker le résultat dans une constante
+importer le model dans sequelize.js ->
 const modelCity = require('./models/city');
+
+// Appeler le modèle et stocker le résultat dans une constante dans sequelize.js ->
+const city = modelCity(sequelize, DataTypes);
 
 // Exporter les modèles par la suite
 module.exports = {

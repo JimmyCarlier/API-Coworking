@@ -1,7 +1,12 @@
 const { ValidationError, Sequelize, QueryTypes } = require("sequelize");
-const { coworking, comment, sequelize } = require("../dataBase/sequelize");
+const {
+  coworking,
+  comment,
+  sequelize,
+  user,
+} = require("../dataBase/sequelize");
 
-exports.findAllCoworkingByPK = (req, res) => {
+exports.AllCoworking = (req, res) => {
   const orderBy = req.query.orderBy || "capacity";
   const test = req.query.test || "ASC";
 
@@ -33,29 +38,26 @@ exports.findAllCoworkingSQL = (req, res) => {
 };
 
 exports.createCoworking = (req, res) => {
-  // const idForobject = coworkings[coworkings.length - 1].id + 1;
-  // const idForNewObj = {
-  //   id: idForobject,
-  //   ...req.body,
-  // };
-  // coworkings.push(idForNewObj);
-  // return res.json({
-  //   message: `Un nouveau coworking à était créée son id est le ${idForobject}`,
-  //   data: idForNewObj,
-  // });
-  coworking
-    .create({
-      name: req.body.name,
-      price: req.body.price,
-      address: req.body.address,
-      superficy: req.body.superficy,
-      capacity: req.body.capacity,
-      created: req.body.created,
+  user
+    .findOne({
+      where: { name: req.username },
     })
-    .then(() => {
-      res.status(201).json({
-        message: "La ligne à bien était créée",
-      });
+    .then((user) => {
+      coworking
+        .create({
+          name: req.body.name,
+          price: req.body.price,
+          address: req.body.address,
+          superficy: req.body.superficy,
+          capacity: req.body.capacity,
+          created: req.body.created,
+          userID: user.id,
+        })
+        .then(() => {
+          res.status(201).json({
+            message: "La ligne à bien était créée",
+          });
+        });
     })
     .catch((error) => {
       if (error instanceof ValidationError) {

@@ -8,8 +8,8 @@ router.route("/Sql").get(coworkinkController.findAllCoworkingSQL);
 
 router
   .route("/")
-  .get(coworkinkController.findAllCoworkingByPK)
-  .post(coworkinkController.createCoworking);
+  .get(coworkinkController.AllCoworking)
+  .post(authController.protect, coworkinkController.createCoworking);
 
 router
   .route("/:id")

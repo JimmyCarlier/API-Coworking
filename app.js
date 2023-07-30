@@ -27,9 +27,3 @@ app.use((req, res) => {
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
-
-// Read
-// app.get("/api/coworkings", (req, res) => {
-//   const arraySort = coworkings.sort((a, b) => a.superficy - b.superficy);
-//   res.json({ result: arraySort });
-// });
