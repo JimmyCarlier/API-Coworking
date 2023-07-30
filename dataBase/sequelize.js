@@ -3,7 +3,6 @@ const modelCoworking = require("../model/modelCoworking");
 const modelCity = require("../model/modelCity");
 const userModel = require("../model/userModel");
 const roleModel = require("../model/modelRole");
-const bcrypt = require("bcrypt");
 const commentary = require("../model/commentModel");
 const setDataSample = require("../dataBase/setDataSample");
 
@@ -23,7 +22,6 @@ sequelize
   );
 
 const coworking = modelCoworking(sequelize, DataTypes);
-const city = modelCity(sequelize, DataTypes);
 const user = userModel(sequelize, DataTypes);
 const role = roleModel(sequelize, DataTypes);
 const comment = commentary(sequelize, DataTypes);
@@ -67,4 +65,5 @@ module.exports = {
   user,
   role,
   comment,
+  sequelize,
 };

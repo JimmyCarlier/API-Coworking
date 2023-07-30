@@ -18,6 +18,12 @@ app.use("/api/coworkings", coworkingRouter);
 app.use("/api/user", userRoutes);
 app.use("/api/comment", commentaryController);
 
+app.use((req, res) => {
+  res
+    .status(404)
+    .json({ message: "Le chemin que vous avez indiqué est invalide" });
+});
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });

@@ -9,13 +9,16 @@ const roleHierarchy = {
   edit: ["user", "edit"],
   admin: ["user", "edit", "admin"],
 };
+
 exports.signup = (req, res) => {
   bcrypt
     .hash(req.body.password, 10)
     .then((hash) => {
       const dataUser = { ...req.body, password: hash };
       return user.create(dataUser).then((data) => {
-        res.status(200).json({ message: "coucou", data: data });
+        res
+          .status(200)
+          .json({ message: "L'utilisateur à bien été crée", data: data });
       });
     })
     .catch((error) => {
@@ -102,6 +105,33 @@ exports.restrictTo = (roleparam) => {
         res.status(403).json({
           message: error.message,
         });
+      });
+  };
+};
+
+exports.restrictToOwnUser = (modelParam) => {
+  return (req, res, next) => {
+    user
+      .findOne({ where: { name: req.username } })
+      .then((idUser) => {
+        modelParam.findByPk(req.params.id).then((coworking) => {
+          if (!coworking) {
+            res.json({ message: `Le coworking demandé n'existe pas` });
+          } else {
+            if (idUser.id === coworking.userID) {
+              next();
+            } else {
+              return res.json({
+                message: `Vous n'êtes pas le créateur de ce coworking`,
+              });
+            }
+          }
+        });
+      })
+      .catch((error) => {
+        res
+          .status(400)
+          .json({ message: `Une erreur est survenue`, data: error.message });
       });
   };
 };

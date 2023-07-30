@@ -15,7 +15,6 @@ exports.showAllComment = (req, res) => {
 };
 
 exports.createComment = (req, res) => {
-  console.log(req.username);
   user
     .findOne({
       where: {

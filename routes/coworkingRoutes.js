@@ -2,6 +2,9 @@ const express = require("express");
 const router = express.Router();
 const coworkinkController = require("../controllers/coworkingController");
 const authController = require("../controllers/authController");
+const { coworking } = require("../dataBase/sequelize");
+
+router.route("/Sql").get(coworkinkController.findAllCoworkingSQL);
 
 router
   .route("/")
@@ -14,8 +17,14 @@ router
   .put(
     authController.protect,
     authController.restrictTo("edit"),
+    authController.restrictToOwnUser(coworking),
     coworkinkController.updateById
   )
-  .delete(coworkinkController.deleteById);
+  .delete(
+    authController.protect,
+    authController.restrictTo("admin"),
+    authController.restrictToOwnUser(coworking),
+    coworkinkController.deleteById
+  );
 
 module.exports = router;

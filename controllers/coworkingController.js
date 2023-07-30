@@ -1,34 +1,29 @@
-const { ValidationError } = require("sequelize");
-const { coworking } = require("../dataBase/sequelize");
+const { ValidationError, Sequelize, QueryTypes } = require("sequelize");
+const { coworking, comment, sequelize } = require("../dataBase/sequelize");
 
 exports.findAllCoworkingByPK = (req, res) => {
-  // const criterium = req.query.criterium || "superficy";
-  // const orderBy = req.query.orderBy || "ASC";
-  // const mokCowork = [...coworkings];
-  // const noSort = req.query.nosort;
-
-  // if (
-  //   !noSort &&
-  //   (orderBy === "ASC" || orderBy === "DESC") &&
-  //   (criterium === "superficy" || criterium === "capacity")
-  // ) {
-  //   mokCowork.sort((a, b) => {
-  //     return orderBy === "DESC"
-  //       ? b[criterium] - a[criterium]
-  //       : a[criterium] - b[criterium];
-  //   });
-  // }
-
-  // console.log(criterium, orderBy);
-  // res.json(mokCowork);
-
   const orderBy = req.query.orderBy || "capacity";
   const test = req.query.test || "ASC";
 
   coworking
     .findAll({
       order: [[orderBy, test]],
+      include: comment,
     })
+    .then((coworkings) => {
+      res.json(coworkings);
+    })
+    .catch((error) => {
+      res.json(`Une erreur à était rencontré ${error}`);
+    });
+};
+
+exports.findAllCoworkingSQL = (req, res) => {
+  sequelize
+    .query(
+      "SELECT name, rating FROM `coworkings` LEFT JOIN `comment` ON  `coworking`.`id` = `comment`.`coworkingID`",
+      { type: QueryTypes.SELECT }
+    )
     .then((coworkings) => {
       res.json(coworkings);
     })
@@ -63,8 +58,8 @@ exports.createCoworking = (req, res) => {
       });
     })
     .catch((error) => {
-      if(error instanceof ValidationError){
-        return res.status(400).json({message : error.message})
+      if (error instanceof ValidationError) {
+        return res.status(400).json({ message: error.message });
       }
       res.status(400).json({
         message: `La ligne n'a pas pu être créée car l'erreur est : ${error}`,
@@ -160,5 +155,3 @@ exports.deleteById = (req, res) => {
       res.status(400).json({ message: `Erreur ! Erreur ! Erreur ! ${error}` });
     });
 };
-
-

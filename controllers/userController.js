@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 
 exports.getAllUser = (req, res) => {
   user
+    .scope("hiddenPassword")
     .findAll()
     .then((user) => {
       res.json({

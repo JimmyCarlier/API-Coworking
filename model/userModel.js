@@ -9,9 +9,15 @@ module.exports = (sequelize, datatypes) => {
       },
       name: { type: datatypes.STRING, unique: true },
       password: datatypes.STRING,
+      roles: datatypes.INTEGER,
     },
     {
       timestamps: false,
+      scopes: {
+        hiddenPassword: {
+          attributes: { exclude: ["password"] },
+        },
+      },
     }
   );
 };

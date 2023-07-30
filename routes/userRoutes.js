@@ -11,7 +11,11 @@ router.route("/login").post(authController.login);
 
 router
   .route("/:id")
-  .delete(authController.protect, userController.destroyUser)
+  .delete(
+    authController.protect,
+    authController.restrictTo("edit"),
+    userController.destroyUser
+  )
   .put(
     authController.protect,
     authController.restrict,
