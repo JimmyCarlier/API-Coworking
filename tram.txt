@@ -9,6 +9,7 @@ npm install morgan
 npm install bcrypt
 npm install jsonwebtoken
 npm install multer
+npm install cors
 
 // Modifier le script du package.json pour utiliser nodemon
 // Ajouter "start": "nodemon app.js" dans la section "scripts"

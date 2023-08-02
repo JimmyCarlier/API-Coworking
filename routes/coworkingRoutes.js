@@ -17,13 +17,13 @@ router
   .put(
     authController.protect,
     authController.restrictTo("edit"),
-    authController.restrictToOwnUser(coworking),
+    // authController.restrictToOwnUser(coworking),
     coworkinkController.updateById
   )
   .delete(
     authController.protect,
     authController.restrictTo("admin"),
-    authController.restrictToOwnUser(coworking),
+    // authController.restrictToOwnUser(coworking),
     coworkinkController.deleteById
   );
 

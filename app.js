@@ -3,7 +3,8 @@ const express = require("express");
 const morgan = require("morgan");
 // npm install express / npm install nodemon
 const app = express();
-const port = 3000;
+const port = 3010;
+var cors = require("cors");
 
 const coworkingRouter = require("./routes/coworkingRoutes");
 const userRoutes = require("./routes/userRoutes");
@@ -11,7 +12,7 @@ const sequelize = require("./dataBase/sequelize");
 const commentaryController = require("./routes/commentRoutes");
 
 sequelize.initDataBase();
-
+app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json());
 app.use("/api/coworkings", coworkingRouter);

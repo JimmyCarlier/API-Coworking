@@ -38,27 +38,27 @@ exports.findAllCoworkingSQL = (req, res) => {
 };
 
 exports.createCoworking = (req, res) => {
-  user
-    .findOne({
-      where: { name: req.username },
+  user;
+  // .findOne({
+  //   where: { name: req.username },
+  // })
+  // .then((user) => {
+  coworking
+    .create({
+      name: req.body.name,
+      price: req.body.price,
+      address: req.body.address,
+      superficy: req.body.superficy,
+      capacity: req.body.capacity,
+      created: req.body.created,
+      userID: 2,
     })
-    .then((user) => {
-      coworking
-        .create({
-          name: req.body.name,
-          price: req.body.price,
-          address: req.body.address,
-          superficy: req.body.superficy,
-          capacity: req.body.capacity,
-          created: req.body.created,
-          userID: user.id,
-        })
-        .then(() => {
-          res.status(201).json({
-            message: "La ligne à bien était créée",
-          });
-        });
+    .then(() => {
+      res.status(200).json({
+        message: "La ligne à bien était créée",
+      });
     })
+    // })
     .catch((error) => {
       if (error instanceof ValidationError) {
         return res.status(400).json({ message: error.message });
@@ -84,7 +84,7 @@ exports.getNameById = (req, res) => {
       if (data === null) {
         throw new Error("ID not found");
       }
-      res.json({ message: data.name });
+      res.json({ data: data });
     })
     .catch((error) => {
       res.status(400).json({ message: `Erreur ! ${error}` });
@@ -116,6 +116,7 @@ exports.updateById = (req, res) => {
       if (result[0] === 0) {
         throw new Error(`L'id n'existe pas`);
       }
+
       res.json(result);
     })
     .catch((error) => {

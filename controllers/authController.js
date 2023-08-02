@@ -39,7 +39,7 @@ exports.login = (req, res) => {
             SECRET_KEY,
             { expiresIn: 60 * 60 }
           );
-          res.json({ message: "successfull", data: token });
+          res.status(200).json({ message: "successfull", data: token });
         } else {
           return res
             .status(400)
@@ -64,7 +64,7 @@ exports.protect = (req, res, next) => {
       // res.json({ message: "Vous avez supprimé l'élément", data: decoded });
       next();
     } catch (error) {
-      res.json({ message: "Token invalid" });
+      res.status(400).json({ message: "Token invalid" });
     }
   }
 };
