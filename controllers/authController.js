@@ -34,7 +34,7 @@ exports.login = (req, res) => {
         if (isValid) {
           const token = jwt.sign(
             {
-              data: req.body.name,
+              data: { Username: req.body.name, userId: user.id },
             },
             SECRET_KEY,
             { expiresIn: 60 * 60 }
@@ -53,6 +53,7 @@ exports.login = (req, res) => {
 };
 
 exports.protect = (req, res, next) => {
+  console.log(req.headers.authorization);
   if (!req.headers.authorization) {
     return res.status(400).json({ message: `Vous n'êtes pas authentifier` });
   }
@@ -60,7 +61,7 @@ exports.protect = (req, res, next) => {
   if (token) {
     try {
       const decoded = jwt.verify(token, SECRET_KEY);
-      req.username = decoded.data;
+      req.username = decoded.data.Username;
       // res.json({ message: "Vous avez supprimé l'élément", data: decoded });
       next();
     } catch (error) {

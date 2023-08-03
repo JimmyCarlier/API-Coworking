@@ -79,7 +79,12 @@ exports.getNameById = (req, res) => {
   //   res.json({ message: `L'élement demander n'existe pas` });
   // }
   coworking
-    .findByPk(req.params.id)
+    .findOne({
+      where: {
+        id: req.params.id,
+      },
+      include: comment,
+    })
     .then((data) => {
       if (data === null) {
         throw new Error("ID not found");

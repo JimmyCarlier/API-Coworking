@@ -14,6 +14,20 @@ exports.showAllComment = (req, res) => {
     });
 };
 
+exports.showCommentPerCoworking = (req, res) => {
+  comment
+    .findAll({
+      where: { coworkingId: req.params.id },
+      include: user,
+    })
+    .then((coworking) => {
+      res.status(200).json({ data: coworking });
+    })
+    .catch((error) => {
+      res.status(400).json({ message: error });
+    });
+};
+
 exports.createComment = (req, res) => {
   user
     .findOne({
@@ -22,6 +36,7 @@ exports.createComment = (req, res) => {
       },
     })
     .then((user) => {
+      console.log(user);
       coworking.findByPk(req.params.id).then((result) => {
         comment
           .create({

@@ -4,16 +4,15 @@ const commentaryController = require("../controllers/commentaryController");
 const authController = require("../controllers/authController");
 const { comment } = require("../dataBase/sequelize");
 
-router
-  .route("/")
-  .get(
-    authController.protect,
-    authController.restrictTo("admin"),
-    commentaryController.showAllComment
-  );
+router.route("/").get(
+  authController.protect,
+  // authController.restrictTo("admin"),
+  commentaryController.showAllComment
+);
 
 router
   .route("/:id")
+  .get(authController.protect, commentaryController.showCommentPerCoworking)
   .delete(
     authController.protect,
     // authController.restrictTo("admin"),
